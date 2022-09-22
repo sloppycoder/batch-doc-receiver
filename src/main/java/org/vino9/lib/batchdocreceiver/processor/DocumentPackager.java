@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.vino9.lib.batchdocreceiver.entity.Document;
 
 @Component
 @Slf4j
@@ -24,7 +25,11 @@ public class DocumentPackager {
 
         log.debug("packer received {} of documents", docs.size());
         docs.forEach(
-            ex -> log.debug("packing document {}", ex.getIn().getBody().toString())
+            ex -> {
+                var doc = (Document) ex.getIn().getBody();
+                doc.markProcessed();
+                log.debug("processed document {}", doc.getId());
+            }
         );
 
     }

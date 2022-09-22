@@ -6,26 +6,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import javax.persistence.NamedQuery;
+import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
+@Data
 @Entity
 @ToString
+@NamedQuery(name = "Document.findPendingDocuments", query = " from Document WHERE status = 0")
 public class Document {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private long id;
 
     @Column(nullable = false)
@@ -47,7 +41,9 @@ public class Document {
     @ToString.Exclude
     private LocalDateTime updatedAt;
 
-
+    public void markProcessed() {
+        this.setStatus(Status.PROCESSED);
+    }
 }
 
 enum Status {PENDING, IN_PROGRESS, PROCESSED, REJECTED, SKIPPED}

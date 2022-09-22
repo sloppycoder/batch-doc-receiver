@@ -13,9 +13,9 @@ spring:
 
 logging:
   level:
-#    org.hibernate:
-#      SQL: debug
-#      type.descriptor.sql: trace
+    org.hibernate:
+      SQL: debug
+      type.descriptor.sql: trace
     org.vino9.lib.batchdocreceiver: debug
 
 camel:

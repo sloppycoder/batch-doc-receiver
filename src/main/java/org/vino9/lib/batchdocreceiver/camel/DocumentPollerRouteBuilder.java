@@ -20,9 +20,10 @@ public class DocumentPollerRouteBuilder extends RouteBuilder {
     @Override
     public void configure() {
         String options = String.join("&", new String[]{
+            "namedQuery=Document.findPendingDocuments",
             "maximumResults=" + batchSize,
             "delay=5000",
-            "consumeDelete=true"
+            "consumeDelete=false"
         });
 
         log.debug("options: {}", options);
