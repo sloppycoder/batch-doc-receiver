@@ -5,7 +5,7 @@ import org.apache.camel.processor.aggregate.GroupedExchangeAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.vino9.lib.batchdocreceiver.entity.Document;
+import org.vino9.lib.batchdocreceiver.data.Document;
 import org.vino9.lib.batchdocreceiver.processor.DocumentPackager;
 
 @Component
@@ -23,15 +23,21 @@ public class DocumentPollerRouteBuilder extends RouteBuilder {
             "namedQuery=Document.findPendingDocuments",
             "maximumResults=" + batchSize,
             "delay=5000",
-            "consumeDelete=false"
+            "consumeDelete=false",
+            "initialDelay=1000",
+            "transacted=true",
+            "joinTransaction=true"
         });
 
         log.debug("options: {}", options);
 
         from(String.format("jpa:%s?%s", Document.class.getCanonicalName(), options))
+            .routeId("eipp-batch-doc-receiver")
             .aggregate(new GroupedExchangeAggregationStrategy()).constant(true)
             .completionSize(batchSize)
             .completionTimeout(1000L)
-            .bean(packer, "pack");
+            .bean(packer, "pack")
+            //.bean(packer, "dumpRegistry")
+            .end();
     }
 }

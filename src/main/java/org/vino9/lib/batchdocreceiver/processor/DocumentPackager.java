@@ -3,19 +3,28 @@ package org.vino9.lib.batchdocreceiver.processor;
  package documents into batch of N
  */
 
+import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.vino9.lib.batchdocreceiver.entity.Document;
+import org.vino9.lib.batchdocreceiver.data.Document;
+import org.vino9.lib.batchdocreceiver.data.Document.Status;
+import org.vino9.lib.batchdocreceiver.data.DocumentRepository;
 
 @Component
 @Slf4j
 public class DocumentPackager {
 
+    @Autowired
+    private DocumentRepository repo;
+
     @Value("${batch-doc-processor.output-batch-size:3}")
     int batchSize;
+
+    HashMap<Long, Integer> registry = new HashMap<>();
 
     public void pack(List<Exchange> docs) throws ProcessingError {
         if (isBatchTooBig(docs.size())) {
@@ -24,14 +33,34 @@ public class DocumentPackager {
         }
 
         log.debug("packer received {} of documents", docs.size());
-        docs.forEach(
-            ex -> {
-                var doc = (Document) ex.getIn().getBody();
-                doc.markProcessed();
-                log.debug("processed document {}", doc.getId());
-            }
-        );
 
+        docs.forEach(
+            ex -> process((Document) ex.getIn().getBody())
+        );
+    }
+
+    private void process(Document doc) {
+        register(doc);
+        doc.setStatus(Status.PROCESSED);
+        repo.save(doc);
+        log.debug("processed document {}", doc.getId());
+    }
+
+    private void register(Document doc) {
+        var id = doc.getId();
+        var counter = 1;
+        if (registry.containsKey(id)) {
+            counter = registry.get(id) + 1;
+        }
+        registry.put(id, counter);
+    }
+
+    public void dumpRegistry() {
+        log.debug("=====");
+        for (var entry : registry.entrySet()) {
+            log.debug("{}={}", entry.getKey(), entry.getValue());
+        }
+        log.debug("=====");
     }
 
     // make it a standalone method so that we can mock it during testing

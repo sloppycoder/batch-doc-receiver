@@ -1,4 +1,4 @@
-package org.vino9.lib.batchdocreceiver.entity;
+package org.vino9.lib.batchdocreceiver.data;
 
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -7,14 +7,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import org.apache.camel.component.jpa.Consumed;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
-@ToString
 @NamedQuery(name = "Document.findPendingDocuments", query = " from Document WHERE status = 0")
 public class Document {
 
@@ -41,9 +45,11 @@ public class Document {
     @ToString.Exclude
     private LocalDateTime updatedAt;
 
-    public void markProcessed() {
-        this.setStatus(Status.PROCESSED);
+    @Consumed
+    public void mark() {
+        this.setStatus(Status.IN_PROGRESS);
     }
+
+    public static enum Status {PENDING, IN_PROGRESS, PROCESSED, REJECTED, SKIPPED}
 }
 
-enum Status {PENDING, IN_PROGRESS, PROCESSED, REJECTED, SKIPPED}

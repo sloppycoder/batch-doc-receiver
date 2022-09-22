@@ -1,27 +1,22 @@
 spring:
   jpa:
-    database: postgresql
-    show-sql: false
+    database: h2
     hibernate:
       ddl-auto: validate
   datasource:
-    url: jdbc:postgresql://localhost/eipp
-    username: svc1
-    password: svc1
+    url: "jdbc:h2:mem:test1"
   flyway:
     enabled: true
+  h2:
+    console.enabled: true
 
 logging:
   level:
     org.hibernate:
       SQL: debug
-      type.descriptor.sql: trace
+      # uncomment to see values for binding variables
+      # type.descriptor.sql: trace
     org.vino9.lib.batchdocreceiver: debug
-
-camel:
-  springboot:
-    main-run-controller: true
-
 
 batch-doc-processor:
   output-batch-size: 3
