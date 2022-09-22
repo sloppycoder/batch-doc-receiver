@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = {"org.vino9.lib.batchdocreceiver.models"})
+@EnableJpaRepositories(basePackages = {"org.vino9.lib.batchdocreceiver.entity"})
 public class BatchDocReceiverApplication {
 
 	public static void main(String[] args) {

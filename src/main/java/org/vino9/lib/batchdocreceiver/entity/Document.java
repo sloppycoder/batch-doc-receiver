@@ -1,23 +1,26 @@
-package org.vino9.lib.batchdocreceiver.models;
+package org.vino9.lib.batchdocreceiver.entity;
 
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Data
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Document {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private long id;
 
     @Column(nullable = false)
@@ -26,15 +29,19 @@ public class Document {
     @Column(nullable = false)
     private String path;
 
+    @Column(nullable = false)
     private Status status = Status.PENDING;
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
+    @ToString.Exclude
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     @UpdateTimestamp
+    @ToString.Exclude
     private LocalDateTime updatedAt;
+
 
 }
 
