@@ -45,15 +45,14 @@ public class DocumentPackager {
     }
 
     private void process(Document doc) {
-        register(doc);
+        register(doc.getId());
 
         doc.setStatus(Status.PROCESSED);
         repo.save(doc);
         log.debug("processed document {}", doc.getId());
     }
 
-    private void register(Document doc) {
-        var id = doc.getId();
+    private void register(long id) {
         var counter = 1;
         if (registry.containsKey(id)) {
             counter = registry.get(id) + 1;

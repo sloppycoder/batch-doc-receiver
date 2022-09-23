@@ -1,4 +1,4 @@
-package org.vino9.lib.batchdocreceiver.camel;
+package org.vino9.lib.batchdocreceiver.config;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.GroupedExchangeAggregationStrategy;
@@ -9,7 +9,7 @@ import org.vino9.lib.batchdocreceiver.data.Document;
 import org.vino9.lib.batchdocreceiver.processor.DocumentPackager;
 
 @Component
-public class DocumentPollerRouteBuilder extends RouteBuilder {
+public class DocumentPollerFlowBuilder extends RouteBuilder {
 
     @Autowired
     private DocumentPackager packer;
