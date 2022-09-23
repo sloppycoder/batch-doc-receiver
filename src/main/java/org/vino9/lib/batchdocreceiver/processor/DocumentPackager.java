@@ -26,21 +26,27 @@ public class DocumentPackager {
 
     HashMap<Long, Integer> registry = new HashMap<>();
 
-    public void pack(List<Exchange> docs) throws ProcessingError {
-        if (isBatchTooBig(docs.size())) {
+    public void pack(List<Exchange> exchanges) throws ProcessingError {
+        if (isBatchTooBig(exchanges.size())) {
             throw new ProcessingError(
                 "received message that contains more than " + batchSize + " documents");
         }
 
-        log.debug("packer received {} of documents", docs.size());
+        log.debug("packer received {} of documents", exchanges.size());
 
-        docs.forEach(
-            ex -> process((Document) ex.getIn().getBody())
-        );
+        for (var ex : exchanges) {
+            var doc = (Document) ex.getIn().getBody();
+            if (doc.getId() == 6) {
+                throw new ProcessingError("6 is bad!!");
+            } else {
+                process(doc);
+            }
+        }
     }
 
     private void process(Document doc) {
         register(doc);
+
         doc.setStatus(Status.PROCESSED);
         repo.save(doc);
         log.debug("processed document {}", doc.getId());
