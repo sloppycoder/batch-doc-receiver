@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.camel.component.jpa.Consumed;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -45,11 +44,10 @@ public class Document {
     @ToString.Exclude
     private LocalDateTime updatedAt;
 
-    @Consumed
     public void mark() {
         this.setStatus(Status.IN_PROGRESS);
     }
 
-    public static enum Status {PENDING, IN_PROGRESS, PROCESSED, REJECTED, SKIPPED}
+    public enum Status {PENDING, IN_PROGRESS, PROCESSED, REJECTED, SKIPPED}
 }
 

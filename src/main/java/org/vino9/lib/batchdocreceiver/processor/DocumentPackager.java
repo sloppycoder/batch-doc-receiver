@@ -5,10 +5,13 @@ package org.vino9.lib.batchdocreceiver.processor;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.Exchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.integration.handler.GenericHandler;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 import org.vino9.lib.batchdocreceiver.data.Document;
 import org.vino9.lib.batchdocreceiver.data.Document.Status;
@@ -16,7 +19,7 @@ import org.vino9.lib.batchdocreceiver.data.DocumentRepository;
 
 @Component
 @Slf4j
-public class DocumentPackager {
+public class DocumentPackager implements GenericHandler<List<Document>> {
 
     @Autowired
     private DocumentRepository repo;
@@ -26,34 +29,36 @@ public class DocumentPackager {
 
     HashMap<Long, Integer> registry = new HashMap<>();
 
-    public void pack(List<Exchange> exchanges) throws ProcessingError {
-        if (isBatchTooBig(exchanges.size())) {
-            throw new ProcessingError(
-                "received message that contains more than " + batchSize + " documents");
-        }
+    @Override
+    public Object handle(List<Document> payload, MessageHeaders headers) {
+        log.debug("packer received {} of documents", payload.size());
 
-        log.debug("packer received {} of documents", exchanges.size());
+        var result = payload.stream()
+            .map(this::process)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
 
-        for (var ex : exchanges) {
-            var doc = (Document) ex.getIn().getBody();
-            if (doc.getId() == 6) {
-                throw new ProcessingError("6 is bad!!");
-            } else {
-                process(doc);
-            }
-        }
+        return result;
     }
 
-    private void process(Document doc) {
-        register(doc);
+    private Optional<Long> process(Document doc) {
+        var id = doc.getId();
+        register(id);
+
+        // simulate processing error for 1 record
+        if (id == 6L) {
+            return Optional.empty();
+        }
 
         doc.setStatus(Status.PROCESSED);
         repo.save(doc);
         log.debug("processed document {}", doc.getId());
+
+        return Optional.of(id);
     }
 
-    private void register(Document doc) {
-        var id = doc.getId();
+    private void register(long id) {
         var counter = 1;
         if (registry.containsKey(id)) {
             counter = registry.get(id) + 1;
@@ -73,4 +78,5 @@ public class DocumentPackager {
     public boolean isBatchTooBig(int size) {
         return size > batchSize;
     }
+
 }
