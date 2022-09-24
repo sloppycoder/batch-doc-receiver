@@ -26,5 +26,3 @@ camel:
 batch-doc-processor:
   output-batch-size: 10
   poll-delay: 5000
-  producer:
-    enabled: false

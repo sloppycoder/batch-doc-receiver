@@ -1,6 +1,5 @@
 package org.vino9.lib.batchdocreceiver.config;
 
-import java.lang.management.ManagementFactory;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +11,6 @@ import org.vino9.lib.batchdocreceiver.processor.RandomDocProducer;
 
 @Component
 public class DocumentPollerFlowBuilder extends RouteBuilder {
-
-    String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-    String homeDir = System.getProperty("user.home");
 
     @Autowired
     private DocumentPackager packer;
@@ -28,8 +24,8 @@ public class DocumentPollerFlowBuilder extends RouteBuilder {
     @Value("${batch-doc-processor.poll-delay:5000}")
     String pollDelay;
 
-    @Value("${batch-doc-processor.producer.enabled}")
-    boolean enableProduccer;
+    @Value("${batch.producer.enabled:false}")
+    boolean enableProducer;
 
     @Override
     public void configure() {
@@ -49,13 +45,10 @@ public class DocumentPollerFlowBuilder extends RouteBuilder {
             .completionSize(batchSize)
             .completionTimeout(1000L)
             .bean(packer, "pack")
-            .log("produced ${body}")
-            .to(String.format(
-                "file:%s/tmp/batch_tests/?fileName=%s.log&appendChars=\\n&fileExist=append",
-                homeDir, jvmName))
+            .log("#produced# [${body}]")
             .end();
 
-        if (enableProduccer) {
+        if (enableProducer) {
             // randomly produce documents to be consumed by other pollers
             from("timer://docProducer?repeatCount=1000")
                 .id("random document producer")
