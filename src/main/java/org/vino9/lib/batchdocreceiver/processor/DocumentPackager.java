@@ -5,6 +5,8 @@ package org.vino9.lib.batchdocreceiver.processor;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Exchange;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,50 +28,34 @@ public class DocumentPackager {
 
     HashMap<Long, Integer> registry = new HashMap<>();
 
-    public void pack(List<Exchange> exchanges) throws ProcessingError {
-        if (isBatchTooBig(exchanges.size())) {
-            throw new ProcessingError(
-                "received message that contains more than " + batchSize + " documents");
-        }
+    public void pack(Exchange exchange) {
+        var payload = (List<Document>) exchange.getIn().getBody();
+        log.debug("packer received {} of documents", payload.size());
 
-        log.debug("packer received {} of documents", exchanges.size());
+        var result = payload.stream()
+            .map(this::process)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(String::valueOf)
+            .collect(Collectors.toList());
 
-        for (var ex : exchanges) {
-            var doc = (Document) ex.getIn().getBody();
-            if (doc.getId() == 6) {
-                throw new ProcessingError("6 is bad!!");
-            } else {
-                process(doc);
-            }
-        }
+        exchange.getMessage().setBody(String.join(",", result));
     }
 
-    private void process(Document doc) {
-        register(doc.getId());
+    private Optional<Long> process(Document doc) {
+        var id = doc.getId();
 
+//        // simulate processing error for 1 record
+//        if (id == 6L) {
+//            return Optional.empty();
+//        }
+//
         doc.setStatus(Status.PROCESSED);
+        doc.setAttempts(doc.getAttempts()+1);
         repo.save(doc);
-        log.debug("processed document {}", doc.getId());
+        log.debug("processed document {}", id);
+
+        return Optional.of(id);
     }
 
-    private void register(long id) {
-        var counter = 1;
-        if (registry.containsKey(id)) {
-            counter = registry.get(id) + 1;
-        }
-        registry.put(id, counter);
-    }
-
-    public void dumpRegistry() {
-        log.debug("=====");
-        for (var entry : registry.entrySet()) {
-            log.debug("{}={}", entry.getKey(), entry.getValue());
-        }
-        log.debug("=====");
-    }
-
-    // make it a standalone method so that we can mock it during testing
-    public boolean isBatchTooBig(int size) {
-        return size > batchSize;
-    }
 }

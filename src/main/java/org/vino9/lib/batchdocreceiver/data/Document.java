@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.camel.component.jpa.Consumed;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -44,6 +45,11 @@ public class Document {
     @UpdateTimestamp
     @ToString.Exclude
     private LocalDateTime updatedAt;
+
+
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int attempts;
 
     @Consumed
     public void mark() {

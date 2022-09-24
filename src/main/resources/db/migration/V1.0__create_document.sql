@@ -4,6 +4,7 @@ create table document
     name       varchar(255)                          not null,
     path       varchar(255)                          not null,
     status     integer                               not null,
+    attempts   integer default 0                     not null,
     created_at timestamp default current_timestamp() not null,
     updated_at timestamp default current_timestamp() not null,
     primary key (id)
