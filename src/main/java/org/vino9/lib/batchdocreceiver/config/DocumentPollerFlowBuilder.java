@@ -21,12 +21,15 @@ public class DocumentPollerFlowBuilder extends RouteBuilder {
     @Value("${batch-doc-processor.output-batch-size:3}")
     int batchSize;
 
+    @Value("${batch-doc-processor.poll-delay:5000}")
+    String pollDelay;
+
     @Override
     public void configure() {
         String options = String.join("&", new String[]{
             "namedQuery=Document.findPendingDocuments",
             "maximumResults=" + batchSize,
-            "delay=5000",
+            "delay="+pollDelay,
             "consumeDelete=false",
             "joinTransaction=true"
         });
