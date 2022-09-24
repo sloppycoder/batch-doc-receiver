@@ -14,7 +14,7 @@ spring:
 logging:
   level:
     org.hibernate:
-      # SQL: debug
+      SQL: debug
       # uncomment to see values for binding variables
       # type.descriptor.sql: trace
     org.vino9.lib.batchdocreceiver: debug
@@ -24,5 +24,7 @@ camel:
     main-run-controller: true
 
 batch-doc-processor:
-  output-batch-size: 3
+  output-batch-size: 10
   poll-delay: 5000
+  producer:
+    enabled: false
