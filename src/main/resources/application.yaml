@@ -17,13 +17,14 @@ logging:
       SQL: debug
       # uncomment to see values for binding variables
       # type.descriptor.sql: trace
-    org.vino9.lib.batchdocreceiver: debug
+    org.vino9.eipp: debug
 
 camel:
   springboot:
     main-run-controller: true
 
 presentment-sender:
-  poll-delay: 100
+  poll-delay: 3000
   output-batch-size: 10
   max-output-size: 100
+  output-path: /Users/lee/tmp/pse

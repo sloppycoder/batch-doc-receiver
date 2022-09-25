@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.vino9.eipp.data.Presentment;
 import org.vino9.eipp.misc.RandomDocProducer;
-import org.vino9.eipp.processor.PresentmentPackager;
+import org.vino9.eipp.promptbiz.PresentmentPackager;
 
 @Component
 public class PresentmentPollerFlowBuilder extends RouteBuilder {
@@ -44,8 +44,7 @@ public class PresentmentPollerFlowBuilder extends RouteBuilder {
             .aggregate(new GroupedBodyAggregationStrategy()).constant(true)
             .completionSize(batchSize)
             .completionTimeout(1000L)
-            .bean(packer, "pack")
-            .log("#produced# [${body}]")
+            .bean(packer, "process")
             .end();
 
         if (enableProducer) {
