@@ -13,6 +13,7 @@ grant all privileges on database eipp to svc1;
 ### start processor with producer enabled
 The producer periodically create random documents that will be processed by the processor
 ```
+# add -Dspring.config.location=file:application.yml if using alternative config file
 java -Dbatch.producer.enabled=true -jar target/batch-doc-receiver-0.0.1-SNAPSHOT.jar > batch_z.log 
 ```
 
