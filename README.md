@@ -2,12 +2,13 @@
 
 Query presentment of PENDING status from a table, group documents into chunk of N, process them, and update the status.
 
-## Prepare PostgreSQL database
+## Prepare MYSQL database
 ```
-create database eipp;
-create user svc1 with encrypted password 'svc1';
-grant all privileges on database eipp to svc1;
+# mysql -u root -p
 
+CREATE USER 'svc1'@'localhost' IDENTIFIED BY 'svc1';
+CREATE DATABASE eipp;
+GRANT ALL PRIVILEGES ON eipp.* TO 'svc1'@'localhost';
 ```
 
 ### start processor with producer enabled

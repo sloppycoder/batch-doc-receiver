@@ -1,11 +1,11 @@
 spring:
   jpa:
-    database: postgresql
-    show-sql: false
+    database: mysql
+    show-sql: true
     hibernate:
       ddl-auto: validate
   datasource:
-    url: jdbc:postgresql://localhost/eipp
+    url: jdbc:mysql://localhost:3306/eipp
     username: svc1
     password: svc1
   flyway:
