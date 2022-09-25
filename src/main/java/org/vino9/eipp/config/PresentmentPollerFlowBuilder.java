@@ -44,6 +44,7 @@ public class PresentmentPollerFlowBuilder extends RouteBuilder {
             .aggregate(new GroupedBodyAggregationStrategy()).constant(true)
             .completionSize(batchSize)
             .completionTimeout(1000L)
+            .setHeader("PSE_OUTPUT_FILE_NAME", simple("PSE_KTB_0011_${date:now:yyyyMMddHHmmss}_REQ"))
             .bean(packer, "process")
             .end();
 
