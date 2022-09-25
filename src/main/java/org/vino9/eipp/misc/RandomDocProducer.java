@@ -1,9 +1,9 @@
-package org.vino9.lib.batchdocreceiver.processor;
+package org.vino9.eipp.misc;
 
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
-import org.vino9.lib.batchdocreceiver.data.Document;
-import org.vino9.lib.batchdocreceiver.data.Document.Status;
+import org.vino9.eipp.data.Presentment;
+import org.vino9.eipp.data.Presentment.Status;
 
 @Component
 public class RandomDocProducer {
@@ -12,7 +12,7 @@ public class RandomDocProducer {
         counter++;
 
         var docName = String.format("doc_%-5d", counter);
-        var doc = new Document();
+        var doc = new Presentment();
         doc.setName(docName);
         doc.setPath("/random_path/tmp/" + docName);
         doc.setAttempts(0);

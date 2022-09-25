@@ -1,8 +1,10 @@
-package org.vino9.lib.batchdocreceiver.processor;
+package org.vino9.eipp.processor;
 /*
  package documents into batch of N
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -12,24 +14,26 @@ import org.apache.camel.Exchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.vino9.lib.batchdocreceiver.data.Document;
-import org.vino9.lib.batchdocreceiver.data.Document.Status;
-import org.vino9.lib.batchdocreceiver.data.DocumentRepository;
+import org.vino9.eipp.data.Presentment;
+import org.vino9.eipp.data.Presentment.Status;
+import org.vino9.eipp.data.PresentmentRepository;
 
 @Component
 @Slf4j
-public class DocumentPackager {
+public class PresentmentPackager {
 
     @Autowired
-    private DocumentRepository repo;
+    private PresentmentRepository repo;
 
-    @Value("${batch-doc-processor.output-batch-size:3}")
+    private XmlMapper mapper = new XmlMapper();
+
+    @Value("${presentment-sender.output-batch-size:3}")
     int batchSize;
 
     HashMap<Long, Integer> registry = new HashMap<>();
 
     public void pack(Exchange exchange) {
-        var payload = (List<Document>) exchange.getIn().getBody();
+        var payload = (List<Presentment>) exchange.getIn().getBody();
         log.debug("packer received {} of documents", payload.size());
 
         var result = payload.stream()
@@ -42,9 +46,14 @@ public class DocumentPackager {
         exchange.getMessage().setBody(String.join(",", result));
     }
 
-    private Optional<Long> process(Document doc) {
+    private Optional<Long> process(Presentment doc) {
         var id = doc.getId();
 
+        try {
+            log.debug("doc[{}]->{}", id, mapper.writeValueAsString(doc));
+        } catch (JsonProcessingException e) {
+            log.debug("unable to convert doc[{}] to XML. {}", id, e);
+        }
 //        // simulate processing error for 1 record
 //        if (id == 6L) {
 //            return Optional.empty();

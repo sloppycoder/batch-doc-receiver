@@ -1,27 +1,27 @@
-package org.vino9.lib.batchdocreceiver.config;
+package org.vino9.eipp.config;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.vino9.lib.batchdocreceiver.data.Document;
-import org.vino9.lib.batchdocreceiver.processor.DocumentPackager;
-import org.vino9.lib.batchdocreceiver.processor.RandomDocProducer;
+import org.vino9.eipp.data.Presentment;
+import org.vino9.eipp.misc.RandomDocProducer;
+import org.vino9.eipp.processor.PresentmentPackager;
 
 @Component
-public class DocumentPollerFlowBuilder extends RouteBuilder {
+public class PresentmentPollerFlowBuilder extends RouteBuilder {
 
     @Autowired
-    private DocumentPackager packer;
+    private PresentmentPackager packer;
 
     @Autowired
     private RandomDocProducer docProducer;
 
-    @Value("${batch-doc-processor.output-batch-size:3}")
+    @Value("${presentment-sender.output-batch-size:3}")
     int batchSize;
 
-    @Value("${batch-doc-processor.poll-delay:5000}")
+    @Value("${presentment-sender.poll-delay:5000}")
     String pollDelay;
 
     @Value("${batch.producer.enabled:false}")
@@ -30,7 +30,7 @@ public class DocumentPollerFlowBuilder extends RouteBuilder {
     @Override
     public void configure() {
         String options = String.join("&", new String[]{
-            "namedQuery=Document.findPendingDocuments",
+            "namedQuery=Presentment.findPendingItems",
             "maximumResults=" + batchSize,
             "delay=" + pollDelay,
             "consumeDelete=false",
@@ -39,7 +39,7 @@ public class DocumentPollerFlowBuilder extends RouteBuilder {
 
         log.debug("options: {}", options);
 
-        from(String.format("jpa:%s?%s", Document.class.getCanonicalName(), options))
+        from(String.format("jpa:%s?%s", Presentment.class.getCanonicalName(), options))
             .routeId("eipp-batch-doc-receiver")
             .aggregate(new GroupedBodyAggregationStrategy()).constant(true)
             .completionSize(batchSize)
@@ -56,7 +56,7 @@ public class DocumentPollerFlowBuilder extends RouteBuilder {
                 .loop().expression(simple("${random(1,15)}"))
                 .bean(docProducer, "produce")
                 .log("${body}")
-                .to(String.format("jpa:%s", Document.class.getCanonicalName()));
+                .to(String.format("jpa:%s", Presentment.class.getCanonicalName()));
         }
     }
 }

@@ -10,7 +10,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.vino9.lib</groupId>
-    <artifactId>batch-doc-receiver</artifactId>
+    <artifactId>presentment-sender</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>batch-doc-receiver</name>
     <description>receive a batch of documents(records) and re-package them</description>
@@ -40,6 +40,10 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

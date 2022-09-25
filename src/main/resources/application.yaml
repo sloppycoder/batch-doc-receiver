@@ -23,6 +23,7 @@ camel:
   springboot:
     main-run-controller: true
 
-batch-doc-processor:
+presentment-sender:
+  poll-delay: 100
   output-batch-size: 10
-  poll-delay: 5000
+  max-output-size: 100
